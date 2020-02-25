@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: jenkins
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: jenkins
+  template:
+    metadata:
+      labels:
+        component: jenkins
+    spec:
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:2.212
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: jenkins
+              mountPath: /var/jenkins_home
+      initContainers:
+        - name: jenkins-data-permission-fix
+          image: busybox
+          command: ["/bin/chmod","-R","777", "/data"]
+          volumeMounts:
+            - name: jenkins
+              mountPath: /data
+      nodeSelector:
+        env: prod            
+      volumes:
+        - name: jenkins
+          persistentVolumeClaim:
+            claimName: jenkins

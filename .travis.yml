@@ -1,0 +1,28 @@
+sudo: required
+services:
+    - docker
+env:
+    global:
+        - SHA=$(git rev-parse HEAD)
+        - CLOUDSDK_CORE_DISABLE_PROMPTS=1    
+before_install:
+    # use service account
+    - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
+    # Install Google Cloud SDK CLI
+    - curl https://sdk.cloud.google.com | bash > /dev/null;
+    - source $HOME/google-cloud-sdk/path.bash.inc
+    # Add kubectl
+    - gcloud components update kubectl
+    # Authorization google cloud with some service account
+    - gcloud auth activate-service-account --key-file service-account.json
+    # set project, compute/zone, and kubernetes cluster
+    - gcloud config set project multi-k8s-266507
+    - gcloud config set compute/zone asia-southeast1-a	
+    - gcloud container clusters get-credentials multi-cluster
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+deploy:
+    provider: script
+    script: kubectl apply -f deploy
+    on:
+        branch: master
