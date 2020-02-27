@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: stormcloaks-com-tls
+  namespace: devops
+spec:
+  secretName: stormcloaks-com
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: '*.stormcloaks.com'
+  dnsNames:
+    - stormcloaks.com
+    - '*.stormcloaks.com'
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains:
+          - stormcloaks.com
+          - '*.stormcloaks.com'
