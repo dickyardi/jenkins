@@ -12,6 +12,7 @@ spec:
   tls:
     - hosts:
         - jenkins.stormcloaks.com
+        - www.jenkins.stormcloaks.com
       secretName: stormcloaks-com
   rules:
     - host: jenkins.stormcloaks.com
@@ -21,3 +22,10 @@ spec:
             backend:
               serviceName: jenkins
               servicePort: 8080
+    - host: www.jenkins.stormcloaks.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: jenkins
+              servicePort: 8080              
